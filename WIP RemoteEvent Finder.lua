@@ -22,6 +22,7 @@ local function createRemoteEventsGUI()
     titleBar.Position = UDim2.new(0, 0, 0, 0)
     titleBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     titleBar.Active = true
+    titleBar.Draggable = true
 
     local titleLabel = Instance.new("TextLabel", titleBar)
     titleLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -37,7 +38,7 @@ local function createRemoteEventsGUI()
     scrollingFrame.Position = UDim2.new(0, 0, 0, 50)
     scrollingFrame.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
     scrollingFrame.ScrollBarThickness = 10
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 10, 0)
 
     -- Create UIListLayout
     local uiListLayout = Instance.new("UIListLayout", scrollingFrame)
@@ -109,23 +110,33 @@ local function createRemoteEventsGUI()
         end
     end)
 
-    -- Create Circular Toggle Button Frame
+    -- Create Rounded Toggle Button with Black Background and White Text
     local toggleButtonFrame = Instance.new("Frame", screenGui)
-    toggleButtonFrame.Size = UDim2.new(0, 50, 0, 50)
+    toggleButtonFrame.Size = UDim2.new(0, 150, 0, 50)
     toggleButtonFrame.Position = UDim2.new(0, 10, 0, 10)
-    toggleButtonFrame.BackgroundTransparency = 1
+    toggleButtonFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    toggleButtonFrame.BackgroundTransparency = 0.5
+    toggleButtonFrame.BorderSizePixel = 0
+    toggleButtonFrame.ClipsDescendants = true
+    toggleButtonFrame.CornerRadius = UDim.new(0, 25) -- Rounded corners
 
-    -- Create Circular Toggle Button
-    local toggleButton = Instance.new("ImageButton", toggleButtonFrame)
+    local toggleButton = Instance.new("TextButton", toggleButtonFrame)
     toggleButton.Size = UDim2.new(1, 0, 1, 0)
-    toggleButton.Image = "rbxassetid://6531587958"
+    toggleButton.Text = "Toggle Menu"
     toggleButton.BackgroundTransparency = 1
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleButton.Font = Enum.Font.SourceSans
+    toggleButton.TextSize = 24
+
+    toggleButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
+    end)
 
     -- Check if the user is on PC or Mobile
     local isMobile = userInputService.TouchEnabled
 
     if isMobile then
-        toggleButton.Visible = false
+        toggleButtonFrame.Visible = false
     else
         -- Create Left Control Instruction for PC
         local controlInstruction = Instance.new("TextLabel", mainFrame)
@@ -138,10 +149,6 @@ local function createRemoteEventsGUI()
         controlInstruction.TextSize = 18
         controlInstruction.TextStrokeTransparency = 0.5
     end
-
-    toggleButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = not mainFrame.Visible
-    end)
 
     local function createRemoteButton(remoteEvent)
         local button = Instance.new("TextButton", scrollingFrame)
@@ -188,8 +195,10 @@ local function createRemoteEventsGUI()
         scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 50)
     end
 
-    -- Update Remote Events periodically
     local startTime = tick()
+    updateRemoteEvents()
+
+    -- Continuously check for changes
     runService.Heartbeat:Connect(function()
         updateRemoteEvents()
     end)
