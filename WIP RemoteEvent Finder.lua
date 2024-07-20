@@ -13,6 +13,7 @@ local function createRemoteEventsGUI()
     mainFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     mainFrame.BorderSizePixel = 0
     mainFrame.Active = true
+    mainFrame.Draggable = true
 
     -- Create Title Bar
     local titleBar = Instance.new("Frame", mainFrame)
@@ -29,7 +30,7 @@ local function createRemoteEventsGUI()
     titleLabel.Font = Enum.Font.SourceSans
     titleLabel.TextSize = 24
 
-    -- Create a UIGradient for main frame
+    -- Create UIGradient for main frame
     local gradient = Instance.new("UIGradient", mainFrame)
     gradient.Color = ColorSequence.new(Color3.fromRGB(150, 150, 150), Color3.fromRGB(100, 100, 100))
     gradient.Rotation = 90
@@ -41,7 +42,7 @@ local function createRemoteEventsGUI()
     scrollingFrame.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
     scrollingFrame.BorderSizePixel = 0
     scrollingFrame.ScrollBarThickness = 10
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 10, 0)
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 
     -- Create UIListLayout
     local uiListLayout = Instance.new("UIListLayout", scrollingFrame)
@@ -78,7 +79,7 @@ local function createRemoteEventsGUI()
     local resizer = Instance.new("Frame", mainFrame)
     resizer.Size = UDim2.new(0, 20, 0, 20)
     resizer.Position = UDim2.new(1, -20, 1, -20)
-    resizer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    resizer.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     resizer.BorderSizePixel = 0
     resizer.Active = true
     resizer.Draggable = true
@@ -99,7 +100,7 @@ local function createRemoteEventsGUI()
         mainFrame.Visible = not mainFrame.Visible
     end)
 
-    -- Create Toggle UI Button
+    -- Create "Toggle UI" Button
     local toggleUIButton = Instance.new("TextButton", screenGui)
     toggleUIButton.Size = UDim2.new(0, 150, 0, 50)
     toggleUIButton.Position = UDim2.new(0, 70, 0, 10)
@@ -108,7 +109,9 @@ local function createRemoteEventsGUI()
     toggleUIButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     toggleUIButton.Font = Enum.Font.SourceSans
     toggleUIButton.TextSize = 24
-    createUICorner(toggleUIButton, 0.1)
+    toggleUIButton.AutoButtonColor = false
+    local uiCorner = Instance.new("UICorner", toggleUIButton)
+    uiCorner.CornerRadius = UDim.new(0.5, 0)
 
     toggleUIButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
@@ -156,39 +159,30 @@ local function createRemoteEventsGUI()
         scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 60)
     end
 
-    -- Draggable functionality
-    local dragging = false
-    local dragInput, dragStart, startPos
-
-    local function update(input)
-        local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    -- Resize Functionality
+    local function onResizeInput(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - resizer.Position
+            mainFrame.Size = UDim2.new(mainFrame.Size.X.Scale, mainFrame.Size.X.Offset + delta.X, mainFrame.Size.Y.Scale, mainFrame.Size.Y.Offset + delta.Y)
+            resizer.Position = input.Position
+        end
     end
 
-    titleBar.InputBegan:Connect(function(input)
+    resizer.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = mainFrame.Position
-
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
+                    resizer.Draggable = false
                 end
             end)
+            resizer.Draggable = true
+            onResizeInput(input)
         end
     end)
 
-    titleBar.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            update(input)
-        end
+    -- Make the UI stay on death
+    player.CharacterAdded:Connect(function()
+        screenGui.Parent = player:WaitForChild("PlayerGui")
     end)
 
     game:GetService("RunService").RenderStepped:Connect(updateRemoteEvents)
