@@ -1,6 +1,7 @@
 local function createRemoteEventsGUI()
     local player = game.Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
+    local UserInputService = game:GetService("UserInputService")
 
     -- Create ScreenGui
     local screenGui = Instance.new("ScreenGui", playerGui)
@@ -11,7 +12,6 @@ local function createRemoteEventsGUI()
     mainFrame.Size = UDim2.new(0.5, 0, 0.5, 0)
     mainFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
     mainFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-    mainFrame.BorderSizePixel = 0
     mainFrame.Active = true
     mainFrame.Draggable = true
 
@@ -19,8 +19,9 @@ local function createRemoteEventsGUI()
     local titleBar = Instance.new("Frame", mainFrame)
     titleBar.Size = UDim2.new(1, 0, 0, 50)
     titleBar.Position = UDim2.new(0, 0, 0, 0)
-    titleBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    titleBar.BorderSizePixel = 0
+    titleBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    titleBar.Active = true
+    titleBar.Draggable = true
 
     local titleLabel = Instance.new("TextLabel", titleBar)
     titleLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -30,31 +31,23 @@ local function createRemoteEventsGUI()
     titleLabel.Font = Enum.Font.SourceSans
     titleLabel.TextSize = 24
 
-    -- Create UIGradient for main frame
-    local gradient = Instance.new("UIGradient", mainFrame)
-    gradient.Color = ColorSequence.new(Color3.fromRGB(150, 150, 150), Color3.fromRGB(100, 100, 100))
-    gradient.Rotation = 90
-
     -- Create ScrollingFrame
     local scrollingFrame = Instance.new("ScrollingFrame", mainFrame)
     scrollingFrame.Size = UDim2.new(1, 0, 1, -110)
     scrollingFrame.Position = UDim2.new(0, 0, 0, 50)
-    scrollingFrame.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
-    scrollingFrame.BorderSizePixel = 0
+    scrollingFrame.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
     scrollingFrame.ScrollBarThickness = 10
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 10, 0)
 
     -- Create UIListLayout
     local uiListLayout = Instance.new("UIListLayout", scrollingFrame)
     uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    uiListLayout.Padding = UDim.new(0, 10)
 
     -- Create Info Frame
     local infoFrame = Instance.new("Frame", mainFrame)
     infoFrame.Size = UDim2.new(1, 0, 0, 60)
     infoFrame.Position = UDim2.new(0, 0, 1, -60)
-    infoFrame.BackgroundColor3 = Color3.fromRGB(160, 160, 160)
-    infoFrame.BorderSizePixel = 0
+    infoFrame.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
 
     -- Create RemoteEvent Count Label
     local remoteEventCountLabel = Instance.new("TextLabel", infoFrame)
@@ -79,10 +72,40 @@ local function createRemoteEventsGUI()
     local resizer = Instance.new("Frame", mainFrame)
     resizer.Size = UDim2.new(0, 20, 0, 20)
     resizer.Position = UDim2.new(1, -20, 1, -20)
-    resizer.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    resizer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     resizer.BorderSizePixel = 0
     resizer.Active = true
     resizer.Draggable = true
+
+    local resizing = false
+    local resizerStartPos
+    local mainFrameStartSize
+
+    resizer.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            resizing = true
+            resizerStartPos = input.Position
+            mainFrameStartSize = mainFrame.Size
+        end
+    end)
+
+    resizer.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            resizing = false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - resizerStartPos
+            mainFrame.Size = UDim2.new(
+                mainFrameStartSize.X.Scale,
+                math.max(200, mainFrameStartSize.X.Offset + delta.X), -- Min size of 200
+                mainFrameStartSize.Y.Scale,
+                math.max(200, mainFrameStartSize.Y.Offset + delta.Y)  -- Min size of 200
+            )
+        end
+    end)
 
     -- Create Circular Toggle Button Frame
     local toggleButtonFrame = Instance.new("Frame", screenGui)
@@ -100,25 +123,6 @@ local function createRemoteEventsGUI()
         mainFrame.Visible = not mainFrame.Visible
     end)
 
-    -- Create "Toggle UI" Button
-    local toggleUIButton = Instance.new("TextButton", screenGui)
-    toggleUIButton.Size = UDim2.new(0, 150, 0, 50)
-    toggleUIButton.Position = UDim2.new(0, 70, 0, 10)
-    toggleUIButton.Text = "Toggle UI"
-    toggleUIButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    toggleUIButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleUIButton.Font = Enum.Font.SourceSans
-    toggleUIButton.TextSize = 24
-    toggleUIButton.AutoButtonColor = false
-    local uiCorner = Instance.new("UICorner", toggleUIButton)
-    uiCorner.CornerRadius = UDim.new(0.5, 0)
-
-    toggleUIButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = not mainFrame.Visible
-    end)
-
-    local remoteButtons = {}
-
     local function createRemoteButton(remoteEvent)
         local button = Instance.new("TextButton", scrollingFrame)
         button.Size = UDim2.new(1, 0, 0, 50)
@@ -133,105 +137,31 @@ local function createRemoteEventsGUI()
                 remoteEvent:FireServer()
             end)
         end)
-
-        remoteButtons[remoteEvent] = button
     end
 
-    local function updateRemoteEvents()
+    local function findRemoteEvents(container)
         local startTime = tick()
         local remoteEventCount = 0
-        for remoteEvent, button in pairs(remoteButtons) do
-            if not remoteEvent:IsDescendantOf(game) then
-                button:Destroy()
-                remoteButtons[remoteEvent] = nil
-            else
-                remoteEventCount = remoteEventCount + 1
+        local function traverse(cont)
+            for _, obj in pairs(cont:GetDescendants()) do
+                if obj:IsA("RemoteEvent") then
+                    createRemoteButton(obj)
+                    remoteEventCount = remoteEventCount + 1
+                end
             end
         end
-        for _, obj in pairs(game:GetDescendants()) do
-            if obj:IsA("RemoteEvent") and not remoteButtons[obj] then
-                createRemoteButton(obj)
-                remoteEventCount = remoteEventCount + 1
-            end
-        end
+        traverse(container)
         remoteEventCountLabel.Text = "RemoteEvents: " .. remoteEventCount
-        timeLabel.Text = string.format("Time: %.2fs", tick() - startTime)
-        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 60)
+        timeLabel.Text = "Time: " .. math.floor(tick() - startTime) .. "s"
+        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 50)
     end
 
-    -- Draggable functionality
-    local dragging = false
-    local dragInput, dragStart, startPos
-
-    local function update(input)
-        local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-
-    titleBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = mainFrame.Position
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    titleBar.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            update(input)
-        end
-    end)
-
-    -- Resizable functionality
-    local function onResizeInput(input)
-        local delta = input.Position - dragStart
-        mainFrame.Size = UDim2.new(
-            mainFrame.Size.X.Scale,
-            math.clamp(startPos.X.Offset + delta.X, 200, 800),
-            mainFrame.Size.Y.Scale,
-            math.clamp(startPos.Y.Offset + delta.Y, 200, 600)
-        )
-    end
-
-    resizer.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragStart = input.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragStart = nil
-                end
-            end)
-        end
-    end)
-
-    resizer.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            if dragStart then
-                onResizeInput(input)
-            end
-        end
-    end)
+    findRemoteEvents(game)
 
     -- Make the UI stay on death
     player.CharacterAdded:Connect(function()
         screenGui.Parent = player:WaitForChild("PlayerGui")
     end)
-
-    game:GetService("RunService").RenderStepped:Connect(updateRemoteEvents)
-
-    updateRemoteEvents()
 end
 
 createRemoteEventsGUI()
