@@ -1,7 +1,6 @@
 local function createRemoteEventsGUI()
     local player = game.Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
-    local UserInputService = game:GetService("UserInputService")
 
     -- Create ScreenGui
     local screenGui = Instance.new("ScreenGui", playerGui)
@@ -21,7 +20,6 @@ local function createRemoteEventsGUI()
     titleBar.Position = UDim2.new(0, 0, 0, 0)
     titleBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     titleBar.Active = true
-    titleBar.Draggable = true
 
     local titleLabel = Instance.new("TextLabel", titleBar)
     titleLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -75,7 +73,6 @@ local function createRemoteEventsGUI()
     resizer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     resizer.BorderSizePixel = 0
     resizer.Active = true
-    resizer.Draggable = true
 
     local resizing = false
     local resizerStartPos
@@ -95,15 +92,16 @@ local function createRemoteEventsGUI()
         end
     end)
 
-    UserInputService.InputChanged:Connect(function(input)
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
         if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - resizerStartPos
             mainFrame.Size = UDim2.new(
                 mainFrameStartSize.X.Scale,
-                math.max(200, mainFrameStartSize.X.Offset + delta.X), -- Min size of 200
+                math.max(mainFrameStartSize.X.Offset + delta.X, 200),
                 mainFrameStartSize.Y.Scale,
-                math.max(200, mainFrameStartSize.Y.Offset + delta.Y)  -- Min size of 200
+                math.max(mainFrameStartSize.Y.Offset + delta.Y, 200)
             )
+            scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, scrollingFrame.UIListLayout.AbsoluteContentSize.Y)
         end
     end)
 
@@ -118,6 +116,25 @@ local function createRemoteEventsGUI()
     toggleButton.Size = UDim2.new(1, 0, 1, 0)
     toggleButton.Image = "rbxassetid://6531587958"
     toggleButton.BackgroundTransparency = 1
+
+    -- Check if the user is on PC or Mobile
+    local userInputService = game:GetService("UserInputService")
+    local isMobile = userInputService.TouchEnabled
+
+    if isMobile then
+        toggleButton.Visible = false
+    else
+        -- Create Left Control Instruction for PC
+        local controlInstruction = Instance.new("TextLabel", mainFrame)
+        controlInstruction.Size = UDim2.new(1, 0, 0, 30)
+        controlInstruction.Position = UDim2.new(0, 0, 0, 10)
+        controlInstruction.Text = "Left Control To Toggle Menu"
+        controlInstruction.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        controlInstruction.TextColor3 = Color3.fromRGB(255, 255, 255)
+        controlInstruction.Font = Enum.Font.SourceSans
+        controlInstruction.TextSize = 18
+        controlInstruction.TextStrokeTransparency = 0.5
+    end
 
     toggleButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
@@ -152,16 +169,11 @@ local function createRemoteEventsGUI()
         end
         traverse(container)
         remoteEventCountLabel.Text = "RemoteEvents: " .. remoteEventCount
-        timeLabel.Text = "Time: " .. math.floor(tick() - startTime) .. "s"
+        timeLabel.Text = "Time: " .. string.format("%.2fs", tick() - startTime)
         scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 50)
     end
 
     findRemoteEvents(game)
-
-    -- Make the UI stay on death
-    player.CharacterAdded:Connect(function()
-        screenGui.Parent = player:WaitForChild("PlayerGui")
-    end)
 end
 
 createRemoteEventsGUI()
