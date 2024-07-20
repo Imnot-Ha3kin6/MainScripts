@@ -12,46 +12,15 @@ local function createRemoteEventsGUI()
     mainFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
     mainFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     mainFrame.Active = true
-
-    -- Make Main Frame Draggable
-    local function onInputBegan(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local startPos = input.Position
-            local startSize = mainFrame.Size
-            local startPosOnScreen = input.Position - mainFrame.AbsolutePosition
-
-            local function onInputChanged(inputChanged)
-                if inputChanged.UserInputType == Enum.UserInputType.MouseMovement then
-                    local delta = inputChanged.Position - startPos
-                    mainFrame.Position = UDim2.new(
-                        mainFrame.Position.X.Scale,
-                        startPosOnScreen.X + delta.X,
-                        mainFrame.Position.Y.Scale,
-                        startPosOnScreen.Y + delta.Y
-                    )
-                end
-            end
-
-            local function onInputEnded(inputEnded)
-                if inputEnded.UserInputType == Enum.UserInputType.MouseButton1 then
-                    game:GetService("UserInputService").InputChanged:Disconnect(onInputChanged)
-                    game:GetService("UserInputService").InputEnded:Disconnect(onInputEnded)
-                end
-            end
-
-            game:GetService("UserInputService").InputChanged:Connect(onInputChanged)
-            game:GetService("UserInputService").InputEnded:Connect(onInputEnded)
-        end
-    end
-
-    mainFrame.InputBegan:Connect(onInputBegan)
+    mainFrame.Draggable = true
 
     -- Create Title Bar
     local titleBar = Instance.new("Frame", mainFrame)
     titleBar.Size = UDim2.new(1, 0, 0, 50)
     titleBar.Position = UDim2.new(0, 0, 0, 0)
-    titleBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Changed to black
+    titleBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     titleBar.Active = true
+    titleBar.Draggable = true
 
     local titleLabel = Instance.new("TextLabel", titleBar)
     titleLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -137,23 +106,17 @@ local function createRemoteEventsGUI()
         end
     end)
 
-    -- Create Black Rounded Toggle Button Frame
+    -- Create Circular Toggle Button Frame
     local toggleButtonFrame = Instance.new("Frame", screenGui)
     toggleButtonFrame.Size = UDim2.new(0, 50, 0, 50)
     toggleButtonFrame.Position = UDim2.new(0, 10, 0, 10)
-    toggleButtonFrame.BackgroundTransparency = 1
+    toggleButtonFrame.BackgroundTransparency = 0
 
-    -- Create Black Rounded Toggle Button
-    local toggleButton = Instance.new("TextButton", toggleButtonFrame)
+    -- Create Circular Toggle Button
+    local toggleButton = Instance.new("ImageButton", toggleButtonFrame)
     toggleButton.Size = UDim2.new(1, 0, 1, 0)
-    toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    toggleButton.Text = "Menu"
-    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleButton.Font = Enum.Font.SourceSansBold
-    toggleButton.TextSize = 24
-    toggleButton.BorderSizePixel = 0
-    toggleButton.TextStrokeTransparency = 0.8
-    toggleButton.BorderRadius = UDim.new(0, 25)
+    toggleButton.Image = "rbxassetid://6531587958"
+    toggleButton.BackgroundTransparency = 0
 
     toggleButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
