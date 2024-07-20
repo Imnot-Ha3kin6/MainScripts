@@ -1,8 +1,6 @@
 local function createRemoteEventsGUI()
     local player = game.Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
-    local userInputService = game:GetService("UserInputService")
-    local runService = game:GetService("RunService")
 
     -- Create ScreenGui
     local screenGui = Instance.new("ScreenGui", playerGui)
@@ -76,7 +74,7 @@ local function createRemoteEventsGUI()
     resizer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     resizer.BorderSizePixel = 0
     resizer.Active = true
-    resizer.Draggable = false -- Not draggable
+    resizer.Draggable = true
 
     local resizing = false
     local resizerStartPos
@@ -96,59 +94,33 @@ local function createRemoteEventsGUI()
         end
     end)
 
-    runService.RenderStepped:Connect(function()
-        if resizing then
-            local mousePos = userInputService:GetMouseLocation()
-            local delta = mousePos - resizerStartPos
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - resizerStartPos
             mainFrame.Size = UDim2.new(
                 mainFrameStartSize.X.Scale,
                 mainFrameStartSize.X.Offset + delta.X,
                 mainFrameStartSize.Y.Scale,
                 mainFrameStartSize.Y.Offset + delta.Y
             )
-            scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, scrollingFrame.UIListLayout.AbsoluteContentSize.Y)
         end
     end)
 
-    -- Create Rounded Toggle Button with Black Background and White Text
+    -- Create Circular Toggle Button Frame
     local toggleButtonFrame = Instance.new("Frame", screenGui)
-    toggleButtonFrame.Size = UDim2.new(0, 150, 0, 50)
+    toggleButtonFrame.Size = UDim2.new(0, 50, 0, 50)
     toggleButtonFrame.Position = UDim2.new(0, 10, 0, 10)
-    toggleButtonFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    toggleButtonFrame.BackgroundTransparency = 0.5
-    toggleButtonFrame.BorderSizePixel = 0
-    toggleButtonFrame.ClipsDescendants = true
-    toggleButtonFrame.CornerRadius = UDim.new(0, 25) -- Rounded corners
+    toggleButtonFrame.BackgroundTransparency = 1
 
-    local toggleButton = Instance.new("TextButton", toggleButtonFrame)
+    -- Create Circular Toggle Button
+    local toggleButton = Instance.new("ImageButton", toggleButtonFrame)
     toggleButton.Size = UDim2.new(1, 0, 1, 0)
-    toggleButton.Text = "Toggle Menu"
+    toggleButton.Image = "rbxassetid://6531587958"
     toggleButton.BackgroundTransparency = 1
-    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleButton.Font = Enum.Font.SourceSans
-    toggleButton.TextSize = 24
 
     toggleButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
     end)
-
-    -- Check if the user is on PC or Mobile
-    local isMobile = userInputService.TouchEnabled
-
-    if isMobile then
-        toggleButtonFrame.Visible = false
-    else
-        -- Create Left Control Instruction for PC
-        local controlInstruction = Instance.new("TextLabel", mainFrame)
-        controlInstruction.Size = UDim2.new(1, 0, 0, 30)
-        controlInstruction.Position = UDim2.new(0, 0, 0, 10)
-        controlInstruction.Text = "Left Control To Toggle Menu"
-        controlInstruction.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        controlInstruction.TextColor3 = Color3.fromRGB(255, 255, 255)
-        controlInstruction.Font = Enum.Font.SourceSans
-        controlInstruction.TextSize = 18
-        controlInstruction.TextStrokeTransparency = 0.5
-    end
 
     local function createRemoteButton(remoteEvent)
         local button = Instance.new("TextButton", scrollingFrame)
@@ -166,42 +138,24 @@ local function createRemoteEventsGUI()
         end)
     end
 
-    local function updateRemoteEvents()
-        -- Remove old buttons
-        for _, obj in pairs(scrollingFrame:GetChildren()) do
-            if obj:IsA("TextButton") then
-                obj:Destroy()
-            end
-        end
-
+    local function findRemoteEvents(container)
+        local startTime = tick()
         local remoteEventCount = 0
-        local existingRemoteEvents = {}
-
         local function traverse(cont)
             for _, obj in pairs(cont:GetDescendants()) do
                 if obj:IsA("RemoteEvent") then
-                    if not existingRemoteEvents[obj] then
-                        createRemoteButton(obj)
-                        existingRemoteEvents[obj] = true
-                        remoteEventCount = remoteEventCount + 1
-                    end
+                    createRemoteButton(obj)
+                    remoteEventCount = remoteEventCount + 1
                 end
             end
         end
-
-        traverse(game)
+        traverse(container)
         remoteEventCountLabel.Text = "RemoteEvents: " .. remoteEventCount
-        timeLabel.Text = "Time: " .. string.format("%.2fs", tick() - startTime)
+        timeLabel.Text = "Time: " .. math.floor(tick() - startTime) .. "s"
         scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 50)
     end
 
-    local startTime = tick()
-    updateRemoteEvents()
-
-    -- Continuously check for changes
-    runService.Heartbeat:Connect(function()
-        updateRemoteEvents()
-    end)
+    findRemoteEvents(game)
 end
 
 createRemoteEventsGUI()
