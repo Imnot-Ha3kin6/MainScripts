@@ -106,17 +106,23 @@ local function createRemoteEventsGUI()
         end
     end)
 
-    -- Create Circular Toggle Button Frame
+    -- Create Black Rounded Toggle Button Frame
     local toggleButtonFrame = Instance.new("Frame", screenGui)
     toggleButtonFrame.Size = UDim2.new(0, 50, 0, 50)
     toggleButtonFrame.Position = UDim2.new(0, 10, 0, 10)
     toggleButtonFrame.BackgroundTransparency = 1
 
-    -- Create Circular Toggle Button
-    local toggleButton = Instance.new("ImageButton", toggleButtonFrame)
+    -- Create Black Rounded Toggle Button
+    local toggleButton = Instance.new("TextButton", toggleButtonFrame)
     toggleButton.Size = UDim2.new(1, 0, 1, 0)
-    toggleButton.Image = "rbxassetid://6531587958"
-    toggleButton.BackgroundTransparency = 1
+    toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    toggleButton.Text = "Menu"
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleButton.Font = Enum.Font.SourceSansBold
+    toggleButton.TextSize = 24
+    toggleButton.BorderSizePixel = 0
+    toggleButton.TextStrokeTransparency = 0.8
+    toggleButton.BorderRadius = UDim.new(0, 25)
 
     toggleButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
