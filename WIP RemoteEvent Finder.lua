@@ -75,6 +75,7 @@ local function createRemoteEventsGUI()
     resizer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     resizer.BorderSizePixel = 0
     resizer.Active = true
+    resizer.Draggable = false -- Not draggable
 
     local resizing = false
     local resizerStartPos
@@ -159,6 +160,13 @@ local function createRemoteEventsGUI()
     end
 
     local function updateRemoteEvents()
+        -- Remove old buttons
+        for _, obj in pairs(scrollingFrame:GetChildren()) do
+            if obj:IsA("TextButton") then
+                obj:Destroy()
+            end
+        end
+
         local remoteEventCount = 0
         local existingRemoteEvents = {}
 
@@ -170,8 +178,6 @@ local function createRemoteEventsGUI()
                         existingRemoteEvents[obj] = true
                         remoteEventCount = remoteEventCount + 1
                     end
-                else
-                    existingRemoteEvents[obj] = nil
                 end
             end
         end
