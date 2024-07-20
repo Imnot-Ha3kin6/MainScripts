@@ -12,15 +12,46 @@ local function createRemoteEventsGUI()
     mainFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
     mainFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     mainFrame.Active = true
-    mainFrame.Draggable = true
+
+    -- Make Main Frame Draggable
+    local function onInputBegan(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local startPos = input.Position
+            local startSize = mainFrame.Size
+            local startPosOnScreen = input.Position - mainFrame.AbsolutePosition
+
+            local function onInputChanged(inputChanged)
+                if inputChanged.UserInputType == Enum.UserInputType.MouseMovement then
+                    local delta = inputChanged.Position - startPos
+                    mainFrame.Position = UDim2.new(
+                        mainFrame.Position.X.Scale,
+                        startPosOnScreen.X + delta.X,
+                        mainFrame.Position.Y.Scale,
+                        startPosOnScreen.Y + delta.Y
+                    )
+                end
+            end
+
+            local function onInputEnded(inputEnded)
+                if inputEnded.UserInputType == Enum.UserInputType.MouseButton1 then
+                    game:GetService("UserInputService").InputChanged:Disconnect(onInputChanged)
+                    game:GetService("UserInputService").InputEnded:Disconnect(onInputEnded)
+                end
+            end
+
+            game:GetService("UserInputService").InputChanged:Connect(onInputChanged)
+            game:GetService("UserInputService").InputEnded:Connect(onInputEnded)
+        end
+    end
+
+    mainFrame.InputBegan:Connect(onInputBegan)
 
     -- Create Title Bar
     local titleBar = Instance.new("Frame", mainFrame)
     titleBar.Size = UDim2.new(1, 0, 0, 50)
     titleBar.Position = UDim2.new(0, 0, 0, 0)
-    titleBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    titleBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Changed to black
     titleBar.Active = true
-    titleBar.Draggable = true
 
     local titleLabel = Instance.new("TextLabel", titleBar)
     titleLabel.Size = UDim2.new(1, 0, 1, 0)
