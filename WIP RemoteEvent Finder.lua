@@ -30,10 +30,18 @@ local function createRemoteEventsGUI()
         return gradient
     end
 
+    -- Create Sidebar Frame
+    local sidebarFrame = Instance.new("Frame", screenGui)
+    sidebarFrame.Size = UDim2.new(0, 200, 1, 0)
+    sidebarFrame.Position = UDim2.new(0, 0, 0, 0)
+    sidebarFrame.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+    sidebarFrame.BorderSizePixel = 0
+    createUICorner(sidebarFrame, 0.05)
+
     -- Create Main Frame
     local mainFrame = Instance.new("Frame", screenGui)
-    mainFrame.Size = UDim2.new(0.5, 0, 0.5, 0)
-    mainFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
+    mainFrame.Size = UDim2.new(1, -210, 1, 0)
+    mainFrame.Position = UDim2.new(0, 210, 0, 0)
     mainFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     mainFrame.BorderSizePixel = 0
     mainFrame.Active = true
@@ -91,7 +99,7 @@ local function createRemoteEventsGUI()
     local timeLabel = Instance.new("TextLabel", infoFrame)
     timeLabel.Size = UDim2.new(0.5, 0, 1, 0)
     timeLabel.Position = UDim2.new(0.5, 0, 0, 0)
-    timeLabel.Text = "Time: 0s"
+    timeLabel.Text = "Time: 0.0s"
     timeLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     timeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     timeLabel.Font = Enum.Font.SourceSans
@@ -108,7 +116,7 @@ local function createRemoteEventsGUI()
     resizer.Draggable = true
 
     -- Create Circular Toggle Button Frame
-    local toggleButtonFrame = Instance.new("Frame", screenGui)
+    local toggleButtonFrame = Instance.new("Frame", sidebarFrame)
     toggleButtonFrame.Size = UDim2.new(0, 50, 0, 50)
     toggleButtonFrame.Position = UDim2.new(0, 10, 0, 10)
     toggleButtonFrame.BackgroundTransparency = 1
@@ -133,20 +141,53 @@ local function createRemoteEventsGUI()
 
     -- Create Settings Frame
     local settingsFrame = Instance.new("Frame", screenGui)
-    settingsFrame.Size = UDim2.new(0, 300, 0, 400)
-    settingsFrame.Position = UDim2.new(1, -310, 0, 10)
+    settingsFrame.Size = UDim2.new(1, -200, 1, -20)
+    settingsFrame.Position = UDim2.new(0, 200, 0, 10)
     settingsFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     settingsFrame.Visible = false
     createUICorner(settingsFrame, 0.05)
 
-    settingsButton.MouseButton1Click:Connect(function()
-        settingsFrame.Visible = not settingsFrame.Visible
-    end)
+    -- Create Settings Header
+    local settingsHeader = Instance.new("Frame", settingsFrame)
+    settingsHeader.Size = UDim2.new(1, 0, 0, 50)
+    settingsHeader.Position = UDim2.new(0, 0, 0, 0)
+    settingsHeader.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    settingsHeader.BorderSizePixel = 0
+    createUICorner(settingsHeader, 0.05)
 
-    -- Create Rainbow Toggle Button
+    local settingsLabel = Instance.new("TextLabel", settingsHeader)
+    settingsLabel.Size = UDim2.new(1, 0, 1, 0)
+    settingsLabel.Text = "Settings"
+    settingsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    settingsLabel.BackgroundTransparency = 1
+    settingsLabel.Font = Enum.Font.SourceSans
+    settingsLabel.TextSize = 24
+
+    -- Create Settings Options
+    local mobileToggleButton = Instance.new("TextButton", settingsFrame)
+    mobileToggleButton.Size = UDim2.new(0, 280, 0, 50)
+    mobileToggleButton.Position = UDim2.new(0, 10, 0, 70)
+    mobileToggleButton.Text = "Toggle UI (Mobile)"
+    mobileToggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    mobileToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    mobileToggleButton.Font = Enum.Font.SourceSans
+    mobileToggleButton.TextSize = 24
+    createUICorner(mobileToggleButton, 0.05)
+
+    local pcKeybindButton = Instance.new("TextButton", settingsFrame)
+    pcKeybindButton.Size = UDim2.new(0, 280, 0, 50)
+    pcKeybindButton.Position = UDim2.new(0, 10, 0, 130)
+    pcKeybindButton.Text = "Set PC Toggle Key (Left Ctrl)"
+    pcKeybindButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    pcKeybindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    pcKeybindButton.Font = Enum.Font.SourceSans
+    pcKeybindButton.TextSize = 24
+    createUICorner(pcKeybindButton, 0.05)
+
+    -- Create Toggle Rainbow Button
     local rainbowToggleButton = Instance.new("TextButton", settingsFrame)
     rainbowToggleButton.Size = UDim2.new(0, 280, 0, 50)
-    rainbowToggleButton.Position = UDim2.new(0, 10, 0, 10)
+    rainbowToggleButton.Position = UDim2.new(0, 10, 0, 190)
     rainbowToggleButton.Text = "Toggle Rainbow"
     rainbowToggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     rainbowToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -163,6 +204,7 @@ local function createRemoteEventsGUI()
             createRainbowGradient(scrollingFrame)
             createRainbowGradient(infoFrame)
         else
+            -- Remove gradients if rainbow is not active
             for _, v in pairs(mainFrame:GetChildren()) do
                 if v:IsA("UIGradient") then
                     v:Destroy()
@@ -186,43 +228,35 @@ local function createRemoteEventsGUI()
         end
     end)
 
-    -- Create Toggle UI Button for Mobile
-    local mobileToggleButton = Instance.new("TextButton", settingsFrame)
-    mobileToggleButton.Size = UDim2.new(0, 280, 0, 50)
-    mobileToggleButton.Position = UDim2.new(0, 10, 0, 70)
-    mobileToggleButton.Text = "Toggle UI (Mobile)"
-    mobileToggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    mobileToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    mobileToggleButton.Font = Enum.Font.SourceSans
-    mobileToggleButton.TextSize = 24
-    createUICorner(mobileToggleButton, 0.05)
-
-    mobileToggleButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = not mainFrame.Visible
-    end)
-
-    -- Create PC Keybind Toggle Button
-    local keybindToggleButton = Instance.new("TextButton", settingsFrame)
-    keybindToggleButton.Size = UDim2.new(0, 280, 0, 50)
-    keybindToggleButton.Position = UDim2.new(0, 10, 0, 130)
-    keybindToggleButton.Text = "Set PC Toggle Key (Left Ctrl)"
-    keybindToggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    keybindToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    keybindToggleButton.Font = Enum.Font.SourceSans
-    keybindToggleButton.TextSize = 24
-    createUICorner(keybindToggleButton, 0.05)
-
     local toggleKey = Enum.KeyCode.LeftControl
-    keybindToggleButton.MouseButton1Click:Connect(function()
-        keybindToggleButton.Text = "Press any key..."
+    pcKeybindButton.MouseButton1Click:Connect(function()
+        pcKeybindButton.Text = "Press any key..."
         local connection
         connection = game:GetService("UserInputService").InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.Keyboard then
                 toggleKey = input.KeyCode
-                keybindToggleButton.Text = "Set PC Toggle Key ("..input.KeyCode.Name..")"
+                pcKeybindButton.Text = "Set PC Toggle Key ("..input.KeyCode.Name..")"
                 connection:Disconnect()
             end
         end)
+    end)
+
+    settingsButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = false
+        settingsFrame.Visible = true
+    end)
+
+    -- Create Toggle Menu Button
+    local menuToggleButton = Instance.new("TextButton", sidebarFrame)
+    menuToggleButton.Size = UDim2.new(0, 50, 0, 50)
+    menuToggleButton.Position = UDim2.new(0, 10, 0, 70)
+    menuToggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    menuToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    menuToggleButton.Text = "Menu"
+    createUICorner(menuToggleButton, 0.1)
+
+    menuToggleButton.MouseButton1Click:Connect(function()
+        sidebarFrame.Visible = not sidebarFrame.Visible
     end)
 
     -- Toggle UI with custom key for PC
@@ -267,7 +301,22 @@ local function createRemoteEventsGUI()
         end
     end)
 
-    -- Function to update the remote event list
+    -- Create Mobile Toggle Button
+    local mobileToggleButton = Instance.new("TextButton", sidebarFrame)
+    mobileToggleButton.Size = UDim2.new(0, 100, 0, 50)
+    mobileToggleButton.Position = UDim2.new(0, 10, 0, 130)
+    mobileToggleButton.Text = "Mobile Toggle"
+    mobileToggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    mobileToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    mobileToggleButton.Font = Enum.Font.SourceSans
+    mobileToggleButton.TextSize = 24
+    createUICorner(mobileToggleButton, 0.05)
+
+    mobileToggleButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
+    end)
+
+    -- Update Remote Events Function
     local function updateRemoteEvents()
         local startTime = tick()
         while true do
@@ -291,21 +340,13 @@ local function createRemoteEventsGUI()
                 end
             end
             remoteEventCountLabel.Text = "RemoteEvents: " .. count
-            timeLabel.Text = "Time: " .. math.floor(tick() - startTime) .. "s"
+            timeLabel.Text = string.format("Time: %.2fs", tick() - startTime)
             scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y)
             wait(1)
         end
     end
 
     coroutine.wrap(updateRemoteEvents)()
-
-    -- Apply initial UI gradient if rainbow is active
-    if rainbowActive then
-        createRainbowGradient(mainFrame)
-        createRainbowGradient(titleBar)
-        createRainbowGradient(scrollingFrame)
-        createRainbowGradient(infoFrame)
-    end
 end
 
 createRemoteEventsGUI()
