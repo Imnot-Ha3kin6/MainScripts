@@ -46,6 +46,7 @@ local function createRemoteEventsGUI()
     -- Create UIListLayout
     local uiListLayout = Instance.new("UIListLayout", scrollingFrame)
     uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    uiListLayout.Padding = UDim.new(0, 10)
 
     -- Create Info Frame
     local infoFrame = Instance.new("Frame", mainFrame)
@@ -98,6 +99,21 @@ local function createRemoteEventsGUI()
         mainFrame.Visible = not mainFrame.Visible
     end)
 
+    -- Create Toggle UI Button
+    local toggleUIButton = Instance.new("TextButton", screenGui)
+    toggleUIButton.Size = UDim2.new(0, 150, 0, 50)
+    toggleUIButton.Position = UDim2.new(0, 70, 0, 10)
+    toggleUIButton.Text = "Toggle UI"
+    toggleUIButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    toggleUIButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleUIButton.Font = Enum.Font.SourceSans
+    toggleUIButton.TextSize = 24
+    createUICorner(toggleUIButton, 0.1)
+
+    toggleUIButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
+    end)
+
     local remoteButtons = {}
 
     local function createRemoteButton(remoteEvent)
@@ -136,8 +152,8 @@ local function createRemoteEventsGUI()
             end
         end
         remoteEventCountLabel.Text = "RemoteEvents: " .. remoteEventCount
-        timeLabel.Text = "Time: " .. math.floor(tick() - startTime) .. "s"
-        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 50)
+        timeLabel.Text = string.format("Time: %.2fs", tick() - startTime)
+        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 60)
     end
 
     -- Draggable functionality
