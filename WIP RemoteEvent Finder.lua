@@ -1,6 +1,8 @@
 local function createRemoteEventsGUI()
     local player = game.Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
+    local userInputService = game:GetService("UserInputService")
+    local runService = game:GetService("RunService")
 
     -- Create ScreenGui
     local screenGui = Instance.new("ScreenGui", playerGui)
@@ -35,7 +37,7 @@ local function createRemoteEventsGUI()
     scrollingFrame.Position = UDim2.new(0, 0, 0, 50)
     scrollingFrame.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
     scrollingFrame.ScrollBarThickness = 10
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 10, 0)
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 
     -- Create UIListLayout
     local uiListLayout = Instance.new("UIListLayout", scrollingFrame)
@@ -92,14 +94,15 @@ local function createRemoteEventsGUI()
         end
     end)
 
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - resizerStartPos
+    runService.RenderStepped:Connect(function()
+        if resizing then
+            local mousePos = userInputService:GetMouseLocation()
+            local delta = mousePos - resizerStartPos
             mainFrame.Size = UDim2.new(
                 mainFrameStartSize.X.Scale,
-                math.max(mainFrameStartSize.X.Offset + delta.X, 200),
+                mainFrameStartSize.X.Offset + delta.X,
                 mainFrameStartSize.Y.Scale,
-                math.max(mainFrameStartSize.Y.Offset + delta.Y, 200)
+                mainFrameStartSize.Y.Offset + delta.Y
             )
             scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, scrollingFrame.UIListLayout.AbsoluteContentSize.Y)
         end
@@ -118,7 +121,6 @@ local function createRemoteEventsGUI()
     toggleButton.BackgroundTransparency = 1
 
     -- Check if the user is on PC or Mobile
-    local userInputService = game:GetService("UserInputService")
     local isMobile = userInputService.TouchEnabled
 
     if isMobile then
@@ -156,24 +158,35 @@ local function createRemoteEventsGUI()
         end)
     end
 
-    local function findRemoteEvents(container)
-        local startTime = tick()
+    local function updateRemoteEvents()
         local remoteEventCount = 0
+        local existingRemoteEvents = {}
+
         local function traverse(cont)
             for _, obj in pairs(cont:GetDescendants()) do
                 if obj:IsA("RemoteEvent") then
-                    createRemoteButton(obj)
-                    remoteEventCount = remoteEventCount + 1
+                    if not existingRemoteEvents[obj] then
+                        createRemoteButton(obj)
+                        existingRemoteEvents[obj] = true
+                        remoteEventCount = remoteEventCount + 1
+                    end
+                else
+                    existingRemoteEvents[obj] = nil
                 end
             end
         end
-        traverse(container)
+
+        traverse(game)
         remoteEventCountLabel.Text = "RemoteEvents: " .. remoteEventCount
         timeLabel.Text = "Time: " .. string.format("%.2fs", tick() - startTime)
         scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 50)
     end
 
-    findRemoteEvents(game)
+    -- Update Remote Events periodically
+    local startTime = tick()
+    runService.Heartbeat:Connect(function()
+        updateRemoteEvents()
+    end)
 end
 
 createRemoteEventsGUI()
