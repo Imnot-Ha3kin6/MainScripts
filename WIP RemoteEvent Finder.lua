@@ -18,7 +18,7 @@ local function createRemoteEventsGUI()
     local titleBar = Instance.new("Frame", mainFrame)
     titleBar.Size = UDim2.new(1, 0, 0, 50)
     titleBar.Position = UDim2.new(0, 0, 0, 0)
-    titleBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    titleBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     titleBar.Active = true
     titleBar.Draggable = true
 
@@ -122,6 +122,8 @@ local function createRemoteEventsGUI()
         mainFrame.Visible = not mainFrame.Visible
     end)
 
+    local remoteButtons = {}
+
     local function createRemoteButton(remoteEvent)
         local button = Instance.new("TextButton", scrollingFrame)
         button.Size = UDim2.new(1, 0, 0, 50)
@@ -136,26 +138,35 @@ local function createRemoteEventsGUI()
                 remoteEvent:FireServer()
             end)
         end)
+
+        remoteButtons[remoteEvent] = button
     end
 
-    local function findRemoteEvents(container)
+    local function updateRemoteEvents()
         local startTime = tick()
         local remoteEventCount = 0
-        local function traverse(cont)
-            for _, obj in pairs(cont:GetDescendants()) do
-                if obj:IsA("RemoteEvent") then
-                    createRemoteButton(obj)
-                    remoteEventCount = remoteEventCount + 1
-                end
+        for remoteEvent, button in pairs(remoteButtons) do
+            if not remoteEvent:IsDescendantOf(game) then
+                button:Destroy()
+                remoteButtons[remoteEvent] = nil
+            else
+                remoteEventCount = remoteEventCount + 1
             end
         end
-        traverse(container)
+        for _, obj in pairs(game:GetDescendants()) do
+            if obj:IsA("RemoteEvent") and not remoteButtons[obj] then
+                createRemoteButton(obj)
+                remoteEventCount = remoteEventCount + 1
+            end
+        end
         remoteEventCountLabel.Text = "RemoteEvents: " .. remoteEventCount
         timeLabel.Text = "Time: " .. math.floor(tick() - startTime) .. "s"
         scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 50)
     end
 
-    findRemoteEvents(game)
+    game:GetService("RunService").RenderStepped:Connect(updateRemoteEvents)
+
+    updateRemoteEvents()
 end
 
 createRemoteEventsGUI()
