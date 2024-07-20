@@ -47,13 +47,12 @@ local function createRemoteEventsGUI()
     timeLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     timeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-    -- Create Toggle Button
-    local toggleButton = Instance.new("TextButton", screenGui)
+    -- Create Circular Toggle Button
+    local toggleButton = Instance.new("ImageButton", screenGui)
     toggleButton.Size = UDim2.new(0.05, 0, 0.05, 0)
     toggleButton.Position = UDim2.new(0, 0, 0, 0)
-    toggleButton.Text = "Toggle"
-    toggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleButton.Image = "rbxassetid://6531587958"
+    toggleButton.BackgroundTransparency = 1
 
     toggleButton.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
@@ -77,12 +76,10 @@ local function createRemoteEventsGUI()
         local startTime = tick()
         local remoteEventCount = 0
         local function traverse(cont)
-            for _, obj in pairs(cont:GetChildren()) do
+            for _, obj in pairs(cont:GetDescendants()) do
                 if obj:IsA("RemoteEvent") then
                     createRemoteButton(obj)
                     remoteEventCount = remoteEventCount + 1
-                elseif obj:IsA("Folder") or obj:IsA("Model") then
-                    traverse(obj)
                 end
             end
         end
