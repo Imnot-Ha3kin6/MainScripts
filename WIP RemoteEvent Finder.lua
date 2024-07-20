@@ -159,24 +159,68 @@ local function createRemoteEventsGUI()
         scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, remoteEventCount * 60)
     end
 
-    -- Resize Functionality
-    local function onResizeInput(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            local delta = input.Position - resizer.Position
-            mainFrame.Size = UDim2.new(mainFrame.Size.X.Scale, mainFrame.Size.X.Offset + delta.X, mainFrame.Size.Y.Scale, mainFrame.Size.Y.Offset + delta.Y)
-            resizer.Position = input.Position
+    -- Draggable functionality
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    titleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
         end
+    end)
+
+    titleBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
+
+    -- Resizable functionality
+    local function onResizeInput(input)
+        local delta = input.Position - dragStart
+        mainFrame.Size = UDim2.new(
+            mainFrame.Size.X.Scale,
+            math.clamp(startPos.X.Offset + delta.X, 200, 800),
+            mainFrame.Size.Y.Scale,
+            math.clamp(startPos.Y.Offset + delta.Y, 200, 600)
+        )
     end
 
     resizer.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragStart = input.Position
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
-                    resizer.Draggable = false
+                    dragStart = nil
                 end
             end)
-            resizer.Draggable = true
-            onResizeInput(input)
+        end
+    end)
+
+    resizer.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            if dragStart then
+                onResizeInput(input)
+            end
         end
     end)
 
