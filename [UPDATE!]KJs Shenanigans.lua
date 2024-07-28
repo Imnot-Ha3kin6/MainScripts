@@ -54,6 +54,9 @@ end
 -- Show Notification
 Notify("Notification", "Use Hunter Bypass Before Using Hunter! Loading in 5 seconds....", 5)
 
+-- Delay Main Script Loading by 5 Seconds
+wait(5)
+
 -- Main Script
 local library = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Imnot-Ha3kin6/MainScripts/main/Shaddow%20Script%20Library.lua"))()
 
