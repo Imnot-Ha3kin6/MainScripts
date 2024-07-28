@@ -35,9 +35,9 @@ tab:CreateButton("20-20-20 Dropkick", function()
     end
 end)
 
-tab:CreateButton("5 Seasons", function()
+tab:CreateButton("Five Seasons", function()
     local player = game:GetService("Players").LocalPlayer
-    local remoteFunction = player.Backpack:FindFirstChild("5 Seasons"):FindFirstChild("Activate"):FindFirstChild("RemoteFunction")
+    local remoteFunction = player.Backpack:FindFirstChild("Five Seasons"):FindFirstChild("Activate"):FindFirstChild("RemoteFunction")
 
     if remoteFunction then
         print("RemoteFunction found, invoking...")
