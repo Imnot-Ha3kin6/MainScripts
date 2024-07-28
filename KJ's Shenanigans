@@ -3,7 +3,7 @@ local library = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/
 local Main = library:CreateWindow("KJ’s Shenanigans", "Crimson")
 
 local tab = Main:CreateTab("Ult Moveset")
-local tab2 = Main:CreateTab("Basic Movesets")
+local tab2 = Main:CreateTab("Basic Moveset")
 local tab3 = Main:CreateTab("Misc")
 local tab4 = Main:CreateTab("Characters")
 
