@@ -2,7 +2,7 @@ local library = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/
 
 local Main = library:CreateWindow("KJ’s Shenanigans", "Crimson")
 
-local tab = Main:CreateTab("Main")
+local tab = Main:CreateTab("Ult Moveset")
 local tab2 = Main:CreateTab("Basic Movesets")
 local tab3 = Main:CreateTab("Misc")
 local tab4 = Main:CreateTab("Characters")
@@ -12,6 +12,17 @@ tab:CreateButton("20 Series", function()
         [1] = "KJ"
     }
     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Ultimate"):FireServer(unpack(args))
+end)
+
+tab:CreateButton("Stoic Bomb", function()
+    local player = game:GetService("Players").LocalPlayer
+    local remoteEvent = player.Backpack:FindFirstChild("Stoic Bomb"):FindFirstChild("Activate"):FindFirstChild("RemoteEvent")
+
+    if remoteEvent then
+        remoteEvent:FireServer()
+    else
+        warn("RemoteEvent not found!")
+    end
 end)
 
 tab:CreateButton("20-20-20 Dropkick", function()
