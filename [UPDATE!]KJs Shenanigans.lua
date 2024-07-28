@@ -52,7 +52,7 @@ function Notify(titletxt, text, time)
 end
 
 -- Show Notification
-Notify("Notification (IF SCRIPT DOESENT LOAD RE-EXECUTE)", "Use Hunter Bypass Before Using Hunter", 5)
+Notify("Notification", "Use Hunter Bypass Before Using Hunter! Loading in 5 seconds....", 5)
 
 -- Main Script
 local library = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Imnot-Ha3kin6/MainScripts/main/Shaddow%20Script%20Library.lua"))()
