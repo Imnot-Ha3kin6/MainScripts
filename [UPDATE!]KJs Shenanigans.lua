@@ -52,7 +52,7 @@ function Notify(titletxt, text, time)
 end
 
 -- Show Notification
-Notify("Brisk Logo Menu", "Use Hunter Bypass Before Using Hunter", 5)
+Notify("Notification (IF SCRIPT DOESENT LOAD RE-EXECUTE)", "Use Hunter Bypass Before Using Hunter", 5)
 
 -- Main Script
 local library = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Imnot-Ha3kin6/MainScripts/main/Shaddow%20Script%20Library.lua"))()
@@ -140,6 +140,10 @@ tab3:CreateButton("Infinite Yield Reborn", function()
     loadstring(game:HttpGet("https://github.com/fuckusfm/infiniteyield-reborn/raw/master/source"))()
 end)
 
+tab3:CreateButton("Turtle Spy", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Turtle-Brand/Turtle-Spy/main/source.lua", true))()
+end)
+
 tab4:CreateButton("Hunter", function()
     local player = game:GetService("Players").LocalPlayer
     player.Data.CurrentCharacter.Value = "Hunter"
@@ -156,6 +160,10 @@ tab5:CreateButton("Hunter Bypass", function()
     elseif game.CreatorType == Enum.CreatorType.Group then
         game.Players.LocalPlayer.UserId = game:GetService("GroupService"):GetGroupInfoAsync(game.CreatorId).Owner.Id
     end
+end)
+
+tab6:CreateButton("Normal Moveset", function()
+  game:GetService("ReplicatedStorage").Remotes.Intro:FireServer("KJ")
 end)
 
 tab:Show()
