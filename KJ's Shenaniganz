@@ -35,24 +35,22 @@ tab:CreateButton("20-20-20 Dropkick", function()
     end
 end)
 
-tab:CreateButton("Five Seasons", function()
-    local player = game:GetService("Players").LocalPlayer
-    local remoteFunction = player.Backpack:FindFirstChild("Five Seasons"):FindFirstChild("Activate"):FindFirstChild("RemoteFunction")
-
-    if remoteFunction then
-        local result = remoteFunction:InvokeServer()
-        print("RemoteFunction result:", result)
-    else
-        warn("RemoteFunction not found!")
-    end
-end)
-
 tab2:CreateButton("Dex", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua", true))()
 end)
 
 tab2:CreateButton("Remotes Finder", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Imnot-Ha3kin6/hhhhh/main/Remote%20Event%20Finder%20PC%20and%20Mobile.lua", true))()
+end)
+
+tab3:CreateButton("Hunter", function()
+    local player = game:GetService("Players").LocalPlayer
+    player.Data.CurrentCharacter.Value = "Hunter"
+end)
+
+tab3:CreateButton("KJ", function()
+    local player = game:GetService("Players").LocalPlayer
+    player.Data.CurrentCharacter.Value = "KJ"
 end)
 
 tab:Show()
