@@ -40,7 +40,6 @@ tab:CreateButton("Five Seasons", function()
     local remoteFunction = player.Backpack:FindFirstChild("Five Seasons"):FindFirstChild("Activate"):FindFirstChild("RemoteFunction")
 
     if remoteFunction then
-        print("RemoteFunction found, invoking...")
         local result = remoteFunction:InvokeServer()
         print("RemoteFunction result:", result)
     else
