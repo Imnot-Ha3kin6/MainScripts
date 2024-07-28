@@ -51,13 +51,35 @@ function Notify(titletxt, text, time)
     GUI:Destroy()
 end
 
--- Show Notification
-Notify("Notification", "Use Hunter Bypass Before Using Hunter! Loading in 5 seconds....", 5)
+-- Developer Detection
+local function isDeveloper(player)
+    -- Replace with your group ID and developer role ID
+    local groupId = 1234567 -- Example group ID
+    local developerRoleId = 255 -- Example developer role ID
+    
+    local playerRank = player:GetRankInGroup(groupId)
+    return playerRank == developerRoleId
+end
 
--- Delay Main Script Loading by 5 Seconds
+local function CheckForDevelopers()
+    while true do
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if isDeveloper(player) then
+                Notify("Developer Joined", "A Developer Has Joined! " .. player.Name, 5)
+                return
+            end
+        end
+        wait(1)
+    end
+end
+
+-- Show Notification and Check for Developers
+Notify("Notification", "Use Hunter Bypass Before Using Hunter! Loading in 5 seconds....", 5)
+coroutine.wrap(CheckForDevelopers)()
+
+-- Main Script (loads after 5 seconds)
 wait(5)
 
--- Main Script
 local library = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Imnot-Ha3kin6/MainScripts/main/Shaddow%20Script%20Library.lua"))()
 
 local Main = library:CreateWindow("KJ’s Shenanigans", "Crimson")
@@ -68,6 +90,7 @@ local tab3 = Main:CreateTab("Other Scripts")
 local tab4 = Main:CreateTab("Characters")
 local tab5 = Main:CreateTab("Bypasses")
 local tab6 = Main:CreateTab("Other Remotes")
+local tab7 = Main:CreateTab("Misc")
 
 tab:CreateButton("20 Series", function()
     local args = {
@@ -139,12 +162,12 @@ tab3:CreateButton("Remotes Finder", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Imnot-Ha3kin6/hhhhh/main/Remote%20Event%20Finder%20PC%20and%20Mobile.lua", true))()
 end)
 
-tab3:CreateButton("Infinite Yield Reborn", function()
-    loadstring(game:HttpGet("https://github.com/fuckusfm/infiniteyield-reborn/raw/master/source"))()
-end)
-
 tab3:CreateButton("Turtle Spy", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Turtle-Brand/Turtle-Spy/main/source.lua", true))()
+end)
+
+tab3:CreateButton("IY Reborn", function()
+    loadstring(game:HttpGet("https://github.com/fuckusfm/infiniteyield-reborn/raw/master/source"))()
 end)
 
 tab4:CreateButton("Hunter", function()
@@ -167,6 +190,10 @@ end)
 
 tab6:CreateButton("Normal Moveset", function()
   game:GetService("ReplicatedStorage").Remotes.Intro:FireServer("KJ")
+end)
+
+tab7:CreateButton("Unload UI", function()
+    game.CoreGui:FindFirstChild("NotificationOof"):Destroy()
 end)
 
 tab:Show()
