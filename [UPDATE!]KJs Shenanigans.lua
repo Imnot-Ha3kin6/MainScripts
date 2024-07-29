@@ -1,3 +1,11 @@
+-- Group ID and Ranks
+local GROUP_ID = 17130836
+local RANKS = {
+    ["Testers"] = true,
+    ["Developers"] = true,
+    ["KJ's"] = true
+}
+
 -- Notification Function
 function Notify(titletxt, text, time)
     local GUI = Instance.new("ScreenGui")
@@ -51,38 +59,16 @@ function Notify(titletxt, text, time)
     GUI:Destroy()
 end
 
--- Developer Detection
-local function isDeveloper(player)
-    -- Replace with your group ID and developer role ID
-    local groupId = 1234567 -- Example group ID
-    local developerRoleId = 255 -- Example developer role ID
-    
-    local playerRank = player:GetRankInGroup(groupId)
-    return playerRank == developerRoleId
-end
-
-local function CheckForDevelopers()
-    while true do
-        for _, player in ipairs(game.Players:GetPlayers()) do
-            if isDeveloper(player) then
-                Notify("Developer Joined", "A Developer Has Joined! " .. player.Name, 5)
-                return
-            end
-        end
-        wait(1)
-    end
-end
-
--- Show Notification and Check for Developers
+-- Show Loading Notification
 Notify("Notification", "Use Hunter Bypass Before Using Hunter! Loading in 5 seconds....", 5)
-coroutine.wrap(CheckForDevelopers)()
 
--- Main Script (loads after 5 seconds)
-wait(5)
+-- Main Script
+wait(5)  -- Wait for 5 seconds before loading the main UI
 
 local library = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Imnot-Ha3kin6/MainScripts/main/Shaddow%20Script%20Library.lua"))()
 
 local Main = library:CreateWindow("KJ’s Shenanigans", "Crimson")
+Main.Name = "MainUiXD"
 
 local tab = Main:CreateTab("Ult Moveset")
 local tab2 = Main:CreateTab("Basic Moveset")
@@ -162,12 +148,12 @@ tab3:CreateButton("Remotes Finder", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Imnot-Ha3kin6/hhhhh/main/Remote%20Event%20Finder%20PC%20and%20Mobile.lua", true))()
 end)
 
-tab3:CreateButton("Turtle Spy", function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Turtle-Brand/Turtle-Spy/main/source.lua", true))()
-end)
-
 tab3:CreateButton("IY Reborn", function()
     loadstring(game:HttpGet("https://github.com/fuckusfm/infiniteyield-reborn/raw/master/source"))()
+end)
+
+tab3:CreateButton("Turtle Spy", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Turtle-Brand/Turtle-Spy/main/source.lua", true))()
 end)
 
 tab4:CreateButton("Hunter", function()
@@ -193,7 +179,32 @@ tab6:CreateButton("Normal Moveset", function()
 end)
 
 tab7:CreateButton("Unload UI", function()
-    game.CoreGui:FindFirstChild("NotificationOof"):Destroy()
+    local mainUI = game.CoreGui:FindFirstChild("MainUiXD")
+    if mainUI then
+        mainUI:Destroy()
+    end
 end)
 
 tab:Show()
+
+-- Check for developers and testers joining
+local function checkForSpecialPlayers()
+    while true do
+        for _, player in pairs(game.Players:GetPlayers()) do
+            local playerRank = player:GetRankInGroup(GROUP_ID)
+            if RANKS[playerRank] then
+                if playerRank == "Developers" then
+                    Notify("Notification", "A Developer Has Joined! " .. player.Name, 5)
+                elseif playerRank == "Testers" then
+                    Notify("Notification", "A Tester Has Joined The Game! Be careful. " .. player.Name, 5)
+                elseif playerRank == "KJ's" then
+                    Notify("Notification", "A Member of KJ's Group Has Joined! " .. player.Name, 5)
+                end
+                break
+            end
+        end
+        wait(1)
+    end
+end
+
+coroutine.wrap(checkForSpecialPlayers)()
